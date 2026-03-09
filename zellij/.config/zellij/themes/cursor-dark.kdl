@@ -1,0 +1,120 @@
+themes {
+    cursor-dark {
+        text_unselected {
+            base 228 228 228
+            background 20 20 20
+            emphasis_0 252 107 131
+            emphasis_1 129 161 193
+            emphasis_2 210 148 62
+            emphasis_3 180 142 173
+        }
+        text_selected {
+            base 228 228 228
+            background 36 36 36
+            emphasis_0 252 107 131
+            emphasis_1 129 161 193
+            emphasis_2 210 148 62
+            emphasis_3 180 142 173
+        }
+        ribbon_selected {
+            base 20 20 20
+            background 129 161 193
+            emphasis_0 252 107 131
+            emphasis_1 228 228 228
+            emphasis_2 180 142 173
+            emphasis_3 136 192 208
+        }
+        ribbon_unselected {
+            base 20 20 20
+            background 36 36 36
+            emphasis_0 252 107 131
+            emphasis_1 228 228 228
+            emphasis_2 136 192 208
+            emphasis_3 180 142 173
+        }
+        table_title {
+            base 210 148 62
+            background 0
+            emphasis_0 252 107 131
+            emphasis_1 129 161 193
+            emphasis_2 210 148 62
+            emphasis_3 180 142 173
+        }
+        table_cell_selected {
+            base 228 228 228
+            background 36 36 36
+            emphasis_0 252 107 131
+            emphasis_1 129 161 193
+            emphasis_2 210 148 62
+            emphasis_3 180 142 173
+        }
+        table_cell_unselected {
+            base 228 228 228
+            background 20 20 20
+            emphasis_0 252 107 131
+            emphasis_1 129 161 193
+            emphasis_2 210 148 62
+            emphasis_3 180 142 173
+        }
+        list_selected {
+            base 228 228 228
+            background 36 36 36
+            emphasis_0 252 107 131
+            emphasis_1 129 161 193
+            emphasis_2 210 148 62
+            emphasis_3 180 142 173
+        }
+        list_unselected {
+            base 228 228 228
+            background 20 20 20
+            emphasis_0 252 107 131
+            emphasis_1 129 161 193
+            emphasis_2 210 148 62
+            emphasis_3 180 142 173
+        }
+        frame_selected {
+            base 129 161 193
+            background 0
+            emphasis_0 252 107 131
+            emphasis_1 136 192 208
+            emphasis_2 180 142 173
+            emphasis_3 0
+        }
+        frame_highlight {
+            base 252 107 131
+            background 0
+            emphasis_0 180 142 173
+            emphasis_1 252 107 131
+            emphasis_2 252 107 131
+            emphasis_3 252 107 131
+        }
+        exit_code_success {
+            base 63 162 102
+            background 0
+            emphasis_0 129 161 193
+            emphasis_1 20 20 20
+            emphasis_2 180 142 173
+            emphasis_3 136 192 208
+        }
+        exit_code_error {
+            base 252 107 131
+            background 0
+            emphasis_0 210 148 62
+            emphasis_1 0
+            emphasis_2 0
+            emphasis_3 0
+        }
+        multiplayer_user_colors {
+            player_1 180 142 173
+            player_2 129 161 193
+            player_3 136 192 208
+            player_4 210 148 62
+            player_5 63 162 102
+            player_6 252 107 131
+            player_7 136 192 208
+            player_8 0
+            player_9 0
+            player_10 0
+        }
+    }
+}
