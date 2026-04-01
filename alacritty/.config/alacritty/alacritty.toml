@@ -1,8 +1,8 @@
 general.live_config_reload = true
 general.import = [
   # "~/.config/alacritty/themes/ayu/ayu_dark.toml"
-  # "~/.config/alacritty/themes/catppuccin/catppuccin-mocha.toml"
-  "~/.config/alacritty/themes/cursor/cursor-dark.toml"
+  "~/.config/alacritty/themes/catppuccin/catppuccin-mocha.toml"
+  # "~/.config/alacritty/themes/cursor/cursor-dark.toml"
 ]
 
 [env]
@@ -16,10 +16,11 @@ startup_mode = "Maximized"
 option_as_alt = "Both"
 
 [font]
-size = 12
-offset = { x = 0, y = 3 }
+size = 14
+# offset = { x = 0, y = 3 }
 
 [font.bold]
+# family = "FiraCode Nerd Font Mono"
 family = "JetBrainsMono Nerd Font"
 style = "Bold"
 
