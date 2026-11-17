@@ -65,6 +65,7 @@ cask "kdenlive"
 cask "steam"
 
 # Utilities
+brew "mas"
 brew "tailscale"
 cask "1password"
 cask "adobe-acrobat-reader"

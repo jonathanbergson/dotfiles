@@ -5,7 +5,7 @@
 No Mac que já possui os pacotes instalados, execute:
 
 ```bash
-brew bundle dump --force --file=~/dotfiles/homebrew/Brewfile
+brew bundle dump --force --file=~/dotfiles/apps/homebrew/Brewfile
 ```
 
 ## 2. Validar o arquivo
@@ -13,7 +13,7 @@ brew bundle dump --force --file=~/dotfiles/homebrew/Brewfile
 Para checar se o arquivo é válido, execute:
 
 ```bash
-brew bundle check --file=~/dotfiles/homebrew/Brewfile
+brew bundle check --file=~/dotfiles/apps/homebrew/Brewfile
 ```
 
 ## 3. Instalar os pacotes
@@ -21,5 +21,5 @@ brew bundle check --file=~/dotfiles/homebrew/Brewfile
 Para instalar os pacotes no novo Mac, execute:
 
 ```bash
-brew bundle install --file=~/dotfiles/homebrew/Brewfile
+brew bundle install --file=~/dotfiles/apps/homebrew/Brewfile
 ```

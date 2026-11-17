@@ -1,0 +1,4 @@
+1569813296  1Password for Safari  (8.12.44)
+ 441258766  Magnet                (3.0.7)
+6757801838  RunCatNeo             (1.0)
+ 497799835  Xcode                 (27.2)
