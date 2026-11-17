@@ -1,0 +1,79 @@
+tap "lucianodiisouza/voulum"
+
+# Fonts
+cask "font-fira-code-nerd-font"
+cask "font-fira-code"
+cask "font-fira-mono-nerd-font"
+cask "font-hack-nerd-font"
+cask "font-jetbrains-mono-nerd-font"
+cask "font-jetbrains-mono"
+cask "font-source-code-pro"
+cask "font-ubuntu-mono-nerd-font"
+cask "font-ubuntu-nerd-font"
+
+# Web browsers
+cask "brave-browser"
+cask "chromium"
+cask "firefox"
+cask "google-chrome"
+cask "microsoft-edge"
+cask "opera"
+cask "zen"
+
+# Communication tools
+cask "discord"
+cask "whatsapp"
+
+# Media tools
+cask "obs"
+cask "spotify"
+cask "vlc"
+
+# Terminal and shell tools
+brew "ctop"
+brew "git"
+brew "stow"
+brew "tmux"
+brew "tree"
+cask "alacritty"
+
+# Development tools
+brew "neovim"
+# cask "cursor"
+# cask "jetbrains-toolbox"
+cask "docker-desktop"
+cask "insomnia"
+cask "mise"
+cask "postman"
+cask "visual-studio-code"
+cask "zed"
+
+# Game development tools
+## 3D modeling and game engines
+cask "blender"
+cask "godot"
+## 2D graphics and image editing
+cask "affinity"
+cask "gimp"
+cask "inkscape"
+cask "krita"
+## Audio editing and video editing
+cask "audacity"
+cask "kdenlive"
+
+# Gaming
+cask "steam"
+
+# Utilities
+brew "tailscale"
+cask "1password"
+cask "adobe-acrobat-reader"
+cask "balenaetcher"
+cask "caffeine"
+# cask "calibre"
+cask "fedora-media-writer"
+cask "localsend"
+cask "lucianodiisouza/voulum/voulum", trusted: true
+cask "onlyoffice"
+cask "transmission"
+cask "vanilla"
