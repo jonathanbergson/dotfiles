@@ -38,12 +38,12 @@ brew "tree"
 cask "alacritty"
 
 # Development tools
+brew "mise"
 brew "neovim"
 # cask "cursor"
 # cask "jetbrains-toolbox"
 cask "docker-desktop"
 cask "insomnia"
-cask "mise"
 cask "postman"
 cask "visual-studio-code"
 cask "zed"
