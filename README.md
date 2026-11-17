@@ -2,7 +2,6 @@
 
 WIP
 
-
 ###### Based on:
 
 - [caiodelgadonew](https://github.com/caiodelgadonew/dotfiles)
