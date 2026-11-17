@@ -1,31 +1,26 @@
 # Dotfiles
 
-1. Gerar chave SSH
-1. Login on GitHub e adicionar a chave SSH
-1. configurar git
-  git config --global user.name "Jonathan Bergson"
-  git config --global user.email "contato@bergson.me"
-1. Clone this `dotfiles` repository to your home directory
-1. Install zsh and oh-my-zsh
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-1. Adicionar tema powerlevel10k e plugins ao oh-my-zsh
-  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
-  git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-1. Configurara theme
+## Setup
+
+Clone este repositório para `~/dotfiles` e execute:
+
 ```sh
-ZSH_THEME="powerlevel10k/powerlevel10k"
-
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
-
-source $ZSH/oh-my-zsh.sh
-source ~/.p10k.zsh
+cd ~/dotfiles
+bash setup.sh
 ```
 
-1. Install Homebrew (https://brew.sh/)
-1. Install dependencies with `brew bundle`
-1. Install dependencies with mas
-1. Run stow to symlink the dotfiles to your home directory with `stow *`
+O script configura a chave SSH e o Git, instala Zsh, Oh My Zsh, Powerlevel10k e
+plugins, e cria os links dos dotfiles com Stow. Ele mostra a chave pública e
+aguarda você adicioná-la manualmente à sua conta do GitHub.
+
+No macOS, também instala o Homebrew e executa o Brewfile em
+`apps/homebrew/Brewfile`. No Linux, instala apenas os pré-requisitos do setup
+(`zsh`, `git`, `curl` e `stow`) usando `apt`, `dnf`, `pacman` ou `zypper`.
+O Brewfile inclui o utilitário `mas`, mas ainda não declara aplicativos da App
+Store para instalar.
+
+Se já houver um `~/.zshrc` que não seja um link simbólico para este repositório,
+integre ou faça backup dele antes: o script não o sobrescreve.
 
 ###### Based on:
 
