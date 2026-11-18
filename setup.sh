@@ -29,8 +29,13 @@ else
   readonly WARNING_RESET=""
 fi
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_HOME="$HOME/dotfiles"
+SCRIPT_SOURCE="${BASH_SOURCE[0]:-}"
+if [[ -f "$SCRIPT_SOURCE" ]]; then
+  SCRIPT_DIR="$(cd -- "$(dirname -- "$SCRIPT_SOURCE")" && pwd)"
+else
+  SCRIPT_DIR="$DOTFILES_HOME"
+fi
 STEP_COUNTER=0
 BREW_BUNDLE_FAILED=0
 

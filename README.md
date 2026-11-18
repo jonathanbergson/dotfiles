@@ -9,6 +9,16 @@ cd ~/dotfiles
 ./setup.sh
 ```
 
+Também é possível baixar o script do GitHub e executá-lo diretamente. Ele
+clonará o repositório para `~/dotfiles`:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/jonathanbergson/dotfiles/main/setup.sh | bash
+```
+
+Esse comando requer `bash`, `curl`, `git` e `ssh-keygen` já disponíveis no
+sistema.
+
 Para criar somente os links dos dotfiles no diretório home com Stow:
 
 ```sh
