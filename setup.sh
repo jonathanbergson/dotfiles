@@ -125,7 +125,7 @@ clone_dotfiles_repository() {
   fi
 }
 
-install_linux_prerequisites() {
+install_linux_zsh() {
   if command -v apt-get >/dev/null 2>&1; then
     run_as_root apt-get update
     run_as_root apt-get install -y zsh git curl stow openssh-client
@@ -136,7 +136,14 @@ install_linux_prerequisites() {
   elif command -v zypper >/dev/null 2>&1; then
     run_as_root zypper --non-interactive install zsh git curl stow openssh
   else
-    die "Distribuição Linux não suportada. Instale zsh, git, curl e stow manualmente."
+    die "Distribuição Linux não suportada. Instale zsh, git, curl, stow e OpenSSH manualmente."
+  fi
+}
+
+install_macos_zsh() {
+  command -v brew >/dev/null 2>&1 || die "Homebrew precisa estar instalado antes do Zsh."
+  if ! command -v zsh >/dev/null 2>&1; then
+    brew install zsh
   fi
 }
 
@@ -162,17 +169,14 @@ install_macos_homebrew_and_brewfile() {
 }
 
 install_zsh() {
-  step "Instalando Zsh e pré-requisitos conforme o sistema operacional"
+  step "Instalando Zsh conforme o sistema operacional"
 
   case "$(uname -s)" in
     Darwin)
-      command -v brew >/dev/null 2>&1 || die "Homebrew precisa estar instalado antes do Zsh."
-      if ! command -v zsh >/dev/null 2>&1; then
-        brew install zsh
-      fi
+      install_macos_zsh
       ;;
     Linux)
-      install_linux_prerequisites
+      install_linux_zsh
       ;;
     *)
       die "Sistema operacional não suportado: $(uname -s)"
