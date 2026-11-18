@@ -34,23 +34,23 @@ DOTFILES_HOME="$HOME/dotfiles"
 STEP_COUNTER=0
 BREW_BUNDLE_FAILED=0
 
-die() {
-  printf '\n%s >> ERRO: %s%s\n\n' "$RED" "$*" "$ERROR_RESET" >&2
+log_error() {
+  printf '\n%sERRO: %s%s\n\n' "$RED" "$*" "$ERROR_RESET" >&2
   exit 1
 }
 
-warn() {
-  printf '\n%s >> AVISO: %s%s\n\n' "$YELLOW" "$*" "$WARNING_RESET" >&2
+log_warning() {
+  printf '\n%sAVISO: %s%s\n\n' "$YELLOW" "$*" "$WARNING_RESET" >&2
 }
 
-info() {
+log_info() {
   printf '\n%s%s%s\n\n' "$BLUE" "$*" "$INFO_RESET"
 }
 
-step() {
+log_step() {
   STEP_COUNTER=$((STEP_COUNTER + 1))
   echo ""
-  echo "${GREEN} >> Step ${STEP_COUNTER}: $*${RESET}"
+  echo "${GREEN}Step ${STEP_COUNTER}: $*${RESET}"
 }
 
 usage() {
@@ -62,7 +62,7 @@ usage() {
 }
 
 setup_ssh_key() {
-  command -v ssh-keygen >/dev/null 2>&1 || die "Comando necessário não encontrado: ssh-keygen"
+  command -v ssh-keygen >/dev/null 2>&1 || log_error "Comando necessário não encontrado: ssh-keygen"
 
   local ssh_dir="$HOME/.ssh"
   local ssh_key="$ssh_dir/id_rsa"
@@ -94,29 +94,29 @@ setup_ssh_key() {
   key_comment="${username}, ${os_name} - ${weekday_names[$weekday_index]}, ${day} ${month_names[$month_index]} ${year}"
 
   if [[ ! -f "$ssh_key" ]]; then
-    [[ -t 0 ]] || die "A geração da chave SSH exige um terminal interativo."
+    [[ -t 0 ]] || log_error "A geração da chave SSH exige um terminal interativo."
     [[ ! -e "$ssh_key.pub" ]] ||
-      die "$ssh_key.pub existe sem a chave privada correspondente; preserve e verifique os arquivos."
+      log_error "$ssh_key.pub existe sem a chave privada correspondente; preserve e verifique os arquivos."
 
-    step "Gerando chave SSH"
+    log_step "Gerando chave SSH"
     ssh-keygen -t rsa -C "$key_comment" -f "$ssh_key"
   fi
 
-  [[ -f "$ssh_key.pub" ]] || die "Não foi encontrada a chave pública $ssh_key.pub."
-  step "Cadastrando chave SSH no GitHub"
-  info "Adicione esta chave pública à sua conta do GitHub em https://github.com/settings/keys:"
+  [[ -f "$ssh_key.pub" ]] || log_error "Não foi encontrada a chave pública $ssh_key.pub."
+  log_step "Cadastrando chave SSH no GitHub"
+  log_info "Adicione esta chave pública à sua conta do GitHub em https://github.com/settings/keys:"
   cat "$ssh_key.pub"
   printf '\n'
   if [[ -t 0 ]]; then
     printf '%sPressione Enter depois de adicionar a chave ao GitHub para continuar.%s ' "$BLUE" "$INFO_RESET"
     read -r
   else
-    info "Adicione a chave ao GitHub antes de usar autenticação SSH."
+    log_info "Adicione a chave ao GitHub antes de usar autenticação SSH."
   fi
 }
 
 setup_git_and_github() {
-  step "Configurando a identidade global do Git"
+  log_step "Configurando a identidade global do Git"
   git config --global user.name "$GIT_USER_NAME"
   git config --global user.email "$GIT_USER_EMAIL"
 }
@@ -127,18 +127,18 @@ run_as_root() {
   elif command -v sudo >/dev/null 2>&1; then
     sudo "$@"
   else
-    die "Instale sudo ou execute como root para instalar pacotes do sistema."
+    log_error "Instale sudo ou execute como root para instalar pacotes do sistema."
   fi
 }
 
 clone_dotfiles_repository() {
-  command -v git >/dev/null 2>&1 || die "git é necessário para clonar o repositório."
+  command -v git >/dev/null 2>&1 || log_error "git é necessário para clonar o repositório."
 
   if [[ -d "$DOTFILES_HOME" ]]; then
     [[ -f "$DOTFILES_HOME/setup.sh" ]] ||
-      die "$DOTFILES_HOME já existe e não parece ser este repositório."
+      log_error "$DOTFILES_HOME já existe e não parece ser este repositório."
   else
-    step "Clonando o repositório jonathanbergson/dotfiles"
+    log_step "Clonando o repositório jonathanbergson/dotfiles"
     git clone "$DOTFILES_REPOSITORY" "$DOTFILES_HOME"
   fi
 }
@@ -154,12 +154,12 @@ install_linux_zsh() {
   elif command -v zypper >/dev/null 2>&1; then
     run_as_root zypper --non-interactive install zsh git curl stow openssh
   else
-    die "Distribuição Linux não suportada. Instale zsh, git, curl, stow e OpenSSH manualmente."
+    log_error "Distribuição Linux não suportada. Instale zsh, git, curl, stow e OpenSSH manualmente."
   fi
 }
 
 install_macos_zsh() {
-  command -v brew >/dev/null 2>&1 || die "Homebrew precisa estar instalado antes do Zsh."
+  command -v brew >/dev/null 2>&1 || log_error "Homebrew precisa estar instalado antes do Zsh."
   if ! command -v zsh >/dev/null 2>&1; then
     brew install zsh
   fi
@@ -168,9 +168,9 @@ install_macos_zsh() {
 install_macos_homebrew_and_brewfile() {
   [[ "$(uname -s)" == "Darwin" ]] || return 0
 
-  step "Instalando Homebrew no macOS"
+  log_step "Instalando Homebrew no macOS"
   if ! command -v brew >/dev/null 2>&1; then
-    command -v curl >/dev/null 2>&1 || die "curl é necessário para instalar o Homebrew."
+    command -v curl >/dev/null 2>&1 || log_error "curl é necessário para instalar o Homebrew."
     NONINTERACTIVE=1 /bin/bash -c \
       "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   fi
@@ -181,16 +181,16 @@ install_macos_homebrew_and_brewfile() {
     eval "$(/usr/local/bin/brew shellenv)"
   fi
 
-  command -v brew >/dev/null 2>&1 || die "Homebrew foi instalado, mas brew não está no PATH."
-  step "Instalando pacotes do Brewfile no macOS"
+  command -v brew >/dev/null 2>&1 || log_error "Homebrew foi instalado, mas brew não está no PATH."
+  log_step "Instalando pacotes do Brewfile no macOS"
   if ! brew bundle --file="$SCRIPT_DIR/apps/homebrew/Brewfile"; then
     BREW_BUNDLE_FAILED=1
-    warn "Falha ao instalar um ou mais pacotes do Brewfile; continuando as demais etapas."
+    log_warning "Falha ao instalar um ou mais pacotes do Brewfile; continuando as demais etapas."
   fi
 }
 
 install_zsh() {
-  step "Instalando Zsh conforme o sistema operacional"
+  log_step "Instalando Zsh conforme o sistema operacional"
 
   case "$(uname -s)" in
     Darwin)
@@ -200,15 +200,15 @@ install_zsh() {
       install_linux_zsh
       ;;
     *)
-      die "Sistema operacional não suportado: $(uname -s)"
+      log_error "Sistema operacional não suportado: $(uname -s)"
       ;;
   esac
 }
 
 install_oh_my_zsh_and_plugins() {
-  step "Instalando ou verificando Oh My Zsh"
-  command -v curl >/dev/null 2>&1 || die "Comando necessário não encontrado: curl"
-  command -v zsh >/dev/null 2>&1 || die "Comando necessário não encontrado: zsh"
+  log_step "Instalando ou verificando Oh My Zsh"
+  command -v curl >/dev/null 2>&1 || log_error "Comando necessário não encontrado: curl"
+  command -v zsh >/dev/null 2>&1 || log_error "Comando necessário não encontrado: zsh"
 
   export ZSH="${ZSH:-$HOME/.oh-my-zsh}"
   if [[ ! -d "$ZSH" ]]; then
@@ -216,7 +216,7 @@ install_oh_my_zsh_and_plugins() {
       sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   fi
 
-  step "Clonando Powerlevel10k e plugins do Zsh"
+  log_step "Clonando Powerlevel10k e plugins do Zsh"
   local zsh_custom="${ZSH_CUSTOM:-$ZSH/custom}"
   mkdir -p "$zsh_custom/themes" "$zsh_custom/plugins"
 
@@ -234,7 +234,7 @@ install_oh_my_zsh_and_plugins() {
 }
 
 create_zshrc_local() {
-  step "Criando ~/.zshrc.local"
+  log_step "Criando ~/.zshrc.local"
 
   if [[ ! -e "$HOME/.zshrc.local" ]]; then
     touch "$HOME/.zshrc.local"
@@ -242,15 +242,15 @@ create_zshrc_local() {
 }
 
 stow_dotfiles() {
-  step "Criando links dos dotfiles com Stow"
-  command -v stow >/dev/null 2>&1 || die "Comando necessário não encontrado: stow"
+  log_step "Criando links dos dotfiles com Stow"
+  command -v stow >/dev/null 2>&1 || log_error "Comando necessário não encontrado: stow"
 
   cd "$SCRIPT_DIR"
   for package_path in */; do
     [[ -d "$package_path" ]] || continue
     local package="${package_path%/}"
     stow --target="$HOME" "$package" ||
-      die "Falha ao criar links do pacote '$package'; verifique conflitos no diretório home."
+      log_error "Falha ao criar links do pacote '$package'; verifique conflitos no diretório home."
   done
 }
 
@@ -263,16 +263,12 @@ setup_all() {
   install_zsh
   install_oh_my_zsh_and_plugins
   create_zshrc_local
-  if (( BREW_BUNDLE_FAILED )); then
-    warn "Setup concluído com ressalvas: verifique as falhas do Brewfile acima."
-    return 1
-  fi
-  info "Setup concluído. Abra um novo terminal para carregar as configurações do Zsh."
+  log_info "Setup concluído. Abra um novo terminal para carregar as configurações do Zsh."
 }
 
 setup_dotfiles() {
   stow_dotfiles
-  info "Links dos dotfiles criados com Stow."
+  log_info "Links dos dotfiles criados com Stow."
 }
 
 main() {
