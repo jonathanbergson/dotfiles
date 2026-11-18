@@ -180,15 +180,6 @@ install_zsh() {
   esac
 }
 
-install_zsh_plugin() {
-  local repository="$1"
-  local destination="$2"
-
-  if [[ ! -d "$destination" ]]; then
-    git clone --depth=1 "$repository" "$destination"
-  fi
-}
-
 install_oh_my_zsh_and_plugins() {
   step "Instalando ou verificando Oh My Zsh"
   command -v curl >/dev/null 2>&1 || die "Comando necessário não encontrado: curl"
@@ -204,15 +195,17 @@ install_oh_my_zsh_and_plugins() {
   local zsh_custom="${ZSH_CUSTOM:-$ZSH/custom}"
   mkdir -p "$zsh_custom/themes" "$zsh_custom/plugins"
 
-  install_zsh_plugin \
-    "https://github.com/romkatv/powerlevel10k.git" \
-    "$zsh_custom/themes/powerlevel10k"
-  install_zsh_plugin \
-    "https://github.com/zsh-users/zsh-autosuggestions.git" \
-    "$zsh_custom/plugins/zsh-autosuggestions"
-  install_zsh_plugin \
-    "https://github.com/zsh-users/zsh-syntax-highlighting.git" \
-    "$zsh_custom/plugins/zsh-syntax-highlighting"
+  if [[ ! -d "$zsh_custom/themes/powerlevel10k" ]]; then
+    git clone --depth=1 "https://github.com/romkatv/powerlevel10k.git" "$zsh_custom/themes/powerlevel10k"
+  fi
+
+  if [[ ! -d "$zsh_custom/plugins/zsh-autosuggestions" ]]; then
+    git clone --depth=1 "https://github.com/zsh-users/zsh-autosuggestions.git" "$zsh_custom/plugins/zsh-autosuggestions"
+  fi
+
+  if [[ ! -d "$zsh_custom/plugins/zsh-syntax-highlighting" ]]; then
+    git clone --depth=1 "https://github.com/zsh-users/zsh-syntax-highlighting.git" "$zsh_custom/plugins/zsh-syntax-highlighting"
+  fi
 }
 
 create_zshrc_local() {
