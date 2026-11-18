@@ -37,6 +37,65 @@ usage() {
   printf '  dotfiles       Cria somente os links dos dotfiles com Stow\n'
 }
 
+setup_ssh_key() {
+  command -v ssh-keygen >/dev/null 2>&1 || die "Comando necessário não encontrado: ssh-keygen"
+
+  local ssh_dir="$HOME/.ssh"
+  local ssh_key="$ssh_dir/id_rsa"
+  local username
+  local os_name
+  local weekday_index
+  local month_index
+  local day
+  local year
+  local key_comment
+  local -a weekday_names=(Domingo Segunda-feira Terça-feira Quarta-feira Quinta-feira Sexta-feira Sábado)
+  local -a month_names=(Janeiro Fevereiro Março Abril Maio Junho Julho Agosto Setembro Outubro Novembro Dezembro)
+
+  mkdir -p "$ssh_dir"
+  chmod 700 "$ssh_dir"
+
+  username="$(id -un)"
+  case "$(uname -s)" in
+    Darwin) os_name="macOS" ;;
+    Linux) os_name="Linux" ;;
+    *) os_name="$(uname -s)" ;;
+  esac
+
+  weekday_index="$(date +%w)"
+  month_index="$(date +%m)"
+  month_index=$((10#$month_index - 1))
+  day="$(date +%d)"
+  year="$(date +%Y)"
+  key_comment="${username}, ${os_name} - ${weekday_names[$weekday_index]}, ${day} ${month_names[$month_index]} ${year}"
+
+  if [[ ! -f "$ssh_key" ]]; then
+    [[ -t 0 ]] || die "A geração da chave SSH exige um terminal interativo."
+    [[ ! -e "$ssh_key.pub" ]] ||
+      die "$ssh_key.pub existe sem a chave privada correspondente; preserve e verifique os arquivos."
+
+    step "Gerando chave SSH"
+    ssh-keygen -t rsa -C "$key_comment" -f "$ssh_key"
+  fi
+
+  [[ -f "$ssh_key.pub" ]] || die "Não foi encontrada a chave pública $ssh_key.pub."
+  step "Cadastrando chave SSH no GitHub"
+  printf '\nAdicione esta chave pública à sua conta do GitHub em https://github.com/settings/keys:\n\n'
+  cat "$ssh_key.pub"
+  printf '\n'
+  if [[ -t 0 ]]; then
+    read -r -p "Pressione Enter depois de adicionar a chave ao GitHub para continuar. "
+  else
+    printf 'Adicione a chave ao GitHub antes de usar autenticação SSH.\n'
+  fi
+}
+
+configure_git() {
+  step "Configurando a identidade global do Git"
+  git config --global user.name "$GIT_USER_NAME"
+  git config --global user.email "$GIT_USER_EMAIL"
+}
+
 run_as_root() {
   if [[ "${EUID:-$(id -u)}" -eq 0 ]]; then
     "$@"
@@ -115,39 +174,6 @@ install_platform_dependencies() {
   esac
 }
 
-setup_ssh_key() {
-  step "Gerando ou verificando a chave SSH e cadastrando-a no GitHub"
-  command -v ssh-keygen >/dev/null 2>&1 || die "Comando necessário não encontrado: ssh-keygen"
-
-  local ssh_dir="$HOME/.ssh"
-  local ssh_key="$ssh_dir/id_ed25519"
-  mkdir -p "$ssh_dir"
-  chmod 700 "$ssh_dir"
-
-  if [[ ! -f "$ssh_key" ]]; then
-    [[ -t 0 ]] || die "A geração da chave SSH exige um terminal interativo."
-    [[ ! -e "$ssh_key.pub" ]] ||
-      die "$ssh_key.pub existe sem a chave privada correspondente; preserve e verifique os arquivos."
-    ssh-keygen -t ed25519 -C "$GIT_USER_EMAIL" -f "$ssh_key"
-  fi
-
-  [[ -f "$ssh_key.pub" ]] || die "Não foi encontrada a chave pública $ssh_key.pub."
-  printf '\nAdicione esta chave pública à sua conta do GitHub em https://github.com/settings/keys:\n\n'
-  cat "$ssh_key.pub"
-  printf '\n'
-  if [[ -t 0 ]]; then
-    read -r -p "Pressione Enter depois de adicionar a chave ao GitHub para continuar. "
-  else
-    printf 'Adicione a chave ao GitHub antes de usar autenticação SSH.\n'
-  fi
-}
-
-configure_git() {
-  step "Configurando a identidade global do Git"
-  git config --global user.name "$GIT_USER_NAME"
-  git config --global user.email "$GIT_USER_EMAIL"
-}
-
 install_oh_my_zsh() {
   step "Instalando ou verificando o Oh My Zsh"
   command -v curl >/dev/null 2>&1 || die "Comando necessário não encontrado: curl"
@@ -199,12 +225,12 @@ stow_dotfiles() {
 }
 
 setup_all() {
-  ensure_dotfiles_repository
-  install_platform_dependencies
   setup_ssh_key
   configure_git
-  install_oh_my_zsh
-  install_zsh_plugins
+  # ensure_dotfiles_repository
+  # install_platform_dependencies
+  # install_oh_my_zsh
+  # install_zsh_plugins
   stow_dotfiles
   printf '\nSetup concluído. Abra um novo terminal para carregar as configurações do Zsh.\n'
 }
