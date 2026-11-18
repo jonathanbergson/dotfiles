@@ -23,7 +23,6 @@ fi
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_HOME="$HOME/dotfiles"
-DOTFILES_DIR="$SCRIPT_DIR"
 STEP_COUNTER=0
 
 die() {
@@ -115,17 +114,14 @@ run_as_root() {
 }
 
 ensure_dotfiles_repository() {
-  step "Verificando ou clonando o repositório dotfiles"
+  command -v git >/dev/null 2>&1 || die "git é necessário para clonar o repositório."
 
-  if [[ "$SCRIPT_DIR" != "$DOTFILES_HOME" ]]; then
-    command -v git >/dev/null 2>&1 || die "git é necessário para clonar o repositório."
-    if [[ -d "$DOTFILES_HOME" ]]; then
-      [[ -f "$DOTFILES_HOME/setup.sh" ]] ||
-        die "$DOTFILES_HOME já existe e não parece ser este repositório."
-    else
-      git clone "$DOTFILES_REPOSITORY" "$DOTFILES_HOME"
-    fi
-    DOTFILES_DIR="$DOTFILES_HOME"
+  if [[ -d "$DOTFILES_HOME" ]]; then
+    [[ -f "$DOTFILES_HOME/setup.sh" ]] ||
+      die "$DOTFILES_HOME já existe e não parece ser este repositório."
+  else
+    step "Clonando o repositório jonathanbergson/dotfiles"
+    git clone "$DOTFILES_REPOSITORY" "$DOTFILES_HOME"
   fi
 }
 
@@ -161,7 +157,7 @@ install_macos_dependencies() {
 
   command -v brew >/dev/null 2>&1 || die "Homebrew foi instalado, mas brew não está no PATH."
   step "Instalando dependências do macOS pelo Brewfile e garantindo o Zsh"
-  brew bundle --file="$DOTFILES_DIR/apps/homebrew/Brewfile"
+  brew bundle --file="$DOTFILES_HOME/apps/homebrew/Brewfile"
 
   if ! command -v zsh >/dev/null 2>&1; then
     brew install zsh
@@ -223,7 +219,7 @@ stow_dotfiles() {
   step "Criando links dos dotfiles com Stow"
   command -v stow >/dev/null 2>&1 || die "Comando necessário não encontrado: stow"
 
-  cd "$DOTFILES_DIR"
+  cd "$SCRIPT_DIR"
   for package_path in */; do
     [[ -d "$package_path" ]] || continue
     local package="${package_path%/}"
@@ -235,7 +231,7 @@ stow_dotfiles() {
 setup_all() {
   setup_ssh_key
   configure_git
-  # ensure_dotfiles_repository
+  ensure_dotfiles_repository
   # install_platform_dependencies
   # install_oh_my_zsh
   # install_zsh_plugins
