@@ -149,17 +149,17 @@ clone_dotfiles_repository() {
 }
 
 install_linux_zsh() {
-  if command -v apt-get >/dev/null 2>&1; then
-    run_as_root apt-get update
-    run_as_root apt-get install -y zsh git curl stow openssh-client
+  if command -v apt >/dev/null 2>&1; then
+    run_as_root apt update
+    run_as_root apt install -y zsh git curl stow
   elif command -v dnf >/dev/null 2>&1; then
-    run_as_root dnf install -y zsh git curl stow openssh-clients
+    run_as_root dnf install -y zsh git curl stow
   elif command -v pacman >/dev/null 2>&1; then
-    run_as_root pacman -S --needed --noconfirm zsh git curl stow openssh
+    run_as_root pacman -S --needed --noconfirm zsh git curl stow
   elif command -v zypper >/dev/null 2>&1; then
-    run_as_root zypper --non-interactive install zsh git curl stow openssh
+    run_as_root zypper --non-interactive install zsh git curl stow
   else
-    log_error "Distribuição Linux não suportada. Instale zsh, git, curl, stow e OpenSSH manualmente."
+    log_error "Distribuição Linux não suportada. Instale zsh, git, curl e stow manualmente."
   fi
 }
 
@@ -195,7 +195,7 @@ install_macos_homebrew_and_brewfile() {
 }
 
 install_zsh() {
-  log_step "Instalando Zsh conforme o sistema operacional"
+  log_step "Instalando Zsh"
 
   case "$(uname -s)" in
     Darwin)
@@ -211,7 +211,7 @@ install_zsh() {
 }
 
 install_oh_my_zsh_and_plugins() {
-  log_step "Instalando ou verificando Oh My Zsh"
+  log_step "Instalando Oh My Zsh"
   command -v curl >/dev/null 2>&1 || log_error "Comando necessário não encontrado: curl"
   command -v zsh >/dev/null 2>&1 || log_error "Comando necessário não encontrado: zsh"
 
@@ -238,15 +238,14 @@ install_oh_my_zsh_and_plugins() {
   fi
 }
 
-create_zshrc_local() {
-  log_step "Criando ~/.zshrc.local"
-
+setup_zshrc_local() {
   if [[ ! -e "$HOME/.zshrc.local" ]]; then
+    log_step "Criando ~/.zshrc.local"
     touch "$HOME/.zshrc.local"
   fi
 }
 
-stow_dotfiles() {
+update_dotfiles() {
   log_step "Criando links dos dotfiles com Stow"
   command -v stow >/dev/null 2>&1 || log_error "Comando necessário não encontrado: stow"
 
@@ -261,18 +260,18 @@ stow_dotfiles() {
 
 setup_all() {
   setup_ssh_key
+  setup_zshrc_local
   setup_git_and_github
   clone_dotfiles_repository
-  stow_dotfiles
+  update_dotfiles
   install_macos_homebrew_and_brewfile
   install_zsh
   install_oh_my_zsh_and_plugins
-  create_zshrc_local
   log_info "Setup concluído. Abra um novo terminal para carregar as configurações do Zsh."
 }
 
 setup_dotfiles() {
-  stow_dotfiles
+  update_dotfiles
   log_info "Links dos dotfiles criados com Stow."
 }
 

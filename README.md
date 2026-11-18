@@ -1,44 +1,41 @@
 # Dotfiles
 
+O script configura a chave SSH, Git, instala Zsh, Oh My Zsh, Powerlevel10k e cria os links simbólicos dos
+dotfiles com Stow. Ele mostra a chave pública e aguarda você adicioná-la
+manualmente à sua conta do GitHub.
+
 ## Setup
 
-Clone este repositório para `~/dotfiles`. Para executar todas as etapas:
+Execute o seguinte comando para fazer o setup completo do ambiente de desenvolvimento:
 
 ```sh
-cd ~/dotfiles
-./setup.sh
-```
-
-Também é possível baixar o script do GitHub e executá-lo diretamente. Ele
-clonará o repositório para `~/dotfiles`:
-
-```sh
+# Executa o script de setup diretamente do repositório
 curl -fsSL https://raw.githubusercontent.com/jonathanbergson/dotfiles/main/setup.sh | bash
 ```
 
 Esse comando requer `bash`, `curl`, `git` e `ssh-keygen` já disponíveis no
 sistema.
 
-Para criar somente os links dos dotfiles no diretório home com Stow:
+## Para rodar o script localmente, faça o clone do repositório e execute:
 
 ```sh
-./setup.sh dotfiles
+# Clone o repositório
+git clone https://github.com/jonathanbergson/dotfiles.git
+
+# Execute o script de setup localmente
+./dotfiles/setup.sh
+
+# Para atualizar apenas os dotfiles, rode:
+./dotfiles/setup.sh dotfiles
 ```
 
-O script configura a chave SSH e o Git, instala Zsh, Oh My Zsh, Powerlevel10k e
-plugins, cria `~/.zshrc.local` se ele ainda não existir e cria os links dos
-dotfiles com Stow. Ele mostra a chave pública e aguarda você adicioná-la
-manualmente à sua conta do GitHub.
+###### Next steps:
 
-No macOS, também instala o Homebrew e executa o Brewfile em
-`apps/homebrew/Brewfile`. No Linux, instala apenas os pré-requisitos do setup
-(`zsh`, `git`, `curl`, `stow` e OpenSSH) usando `apt`, `dnf`, `pacman` ou
-`zypper`.
-O Brewfile inclui o utilitário `mas`, mas ainda não declara aplicativos da App
-Store para instalar.
-
-Se já houver um `~/.zshrc` que não seja um link simbólico para este repositório,
-integre ou faça backup dele antes: o script não o sobrescreve.
+- Separar as funções install_homebrew e setup_macos_brewfile, setup_macos_mas
+- Exibir mensagem de log_step apenas quando o comando realmente for executado
+- Exibir uma log_gray_step para cada comando que não for executado, mas que já esteja instalado
+- Adicionar uma função para instalar o mise co nodejs, python, rust
+- Criar mensagem se sublog, para quando está instalando os plugins do zsh
 
 ###### Based on:
 
