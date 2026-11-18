@@ -16,12 +16,14 @@ Para criar somente os links dos dotfiles no diretório home com Stow:
 ```
 
 O script configura a chave SSH e o Git, instala Zsh, Oh My Zsh, Powerlevel10k e
-plugins, e cria os links dos dotfiles com Stow. Ele mostra a chave pública e
-aguarda você adicioná-la manualmente à sua conta do GitHub.
+plugins, cria `~/.zshrc.local` se ele ainda não existir e cria os links dos
+dotfiles com Stow. Ele mostra a chave pública e aguarda você adicioná-la
+manualmente à sua conta do GitHub.
 
 No macOS, também instala o Homebrew e executa o Brewfile em
 `apps/homebrew/Brewfile`. No Linux, instala apenas os pré-requisitos do setup
-(`zsh`, `git`, `curl` e `stow`) usando `apt`, `dnf`, `pacman` ou `zypper`.
+(`zsh`, `git`, `curl`, `stow` e OpenSSH) usando `apt`, `dnf`, `pacman` ou
+`zypper`.
 O Brewfile inclui o utilitário `mas`, mas ainda não declara aplicativos da App
 Store para instalar.
 

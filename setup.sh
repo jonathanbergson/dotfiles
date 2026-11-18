@@ -97,7 +97,7 @@ setup_ssh_key() {
   fi
 }
 
-configure_git() {
+setup_git_and_github() {
   step "Configurando a identidade global do Git"
   git config --global user.name "$GIT_USER_NAME"
   git config --global user.email "$GIT_USER_EMAIL"
@@ -113,7 +113,7 @@ run_as_root() {
   fi
 }
 
-ensure_dotfiles_repository() {
+clone_dotfiles_repository() {
   command -v git >/dev/null 2>&1 || die "git é necessário para clonar o repositório."
 
   if [[ -d "$DOTFILES_HOME" ]]; then
@@ -126,23 +126,24 @@ ensure_dotfiles_repository() {
 }
 
 install_linux_prerequisites() {
-  step "Instalando pré-requisitos no Linux"
   if command -v apt-get >/dev/null 2>&1; then
     run_as_root apt-get update
-    run_as_root apt-get install -y zsh git curl stow
+    run_as_root apt-get install -y zsh git curl stow openssh-client
   elif command -v dnf >/dev/null 2>&1; then
-    run_as_root dnf install -y zsh git curl stow
+    run_as_root dnf install -y zsh git curl stow openssh-clients
   elif command -v pacman >/dev/null 2>&1; then
-    run_as_root pacman -S --needed --noconfirm zsh git curl stow
+    run_as_root pacman -S --needed --noconfirm zsh git curl stow openssh
   elif command -v zypper >/dev/null 2>&1; then
-    run_as_root zypper --non-interactive install zsh git curl stow
+    run_as_root zypper --non-interactive install zsh git curl stow openssh
   else
     die "Distribuição Linux não suportada. Instale zsh, git, curl e stow manualmente."
   fi
 }
 
-install_macos_dependencies() {
-  step "Instalando ou verificando o Homebrew"
+install_macos_homebrew_and_brewfile() {
+  [[ "$(uname -s)" == "Darwin" ]] || return 0
+
+  step "Instalando Homebrew no macOS"
   if ! command -v brew >/dev/null 2>&1; then
     command -v curl >/dev/null 2>&1 || die "curl é necessário para instalar o Homebrew."
     NONINTERACTIVE=1 /bin/bash -c \
@@ -156,18 +157,19 @@ install_macos_dependencies() {
   fi
 
   command -v brew >/dev/null 2>&1 || die "Homebrew foi instalado, mas brew não está no PATH."
-  step "Instalando dependências do macOS pelo Brewfile e garantindo o Zsh"
-  brew bundle --file="$DOTFILES_HOME/apps/homebrew/Brewfile"
-
-  if ! command -v zsh >/dev/null 2>&1; then
-    brew install zsh
-  fi
+  step "Instalando pacotes do Brewfile no macOS"
+  brew bundle --file="$SCRIPT_DIR/apps/homebrew/Brewfile"
 }
 
-install_platform_dependencies() {
+install_zsh() {
+  step "Instalando Zsh e pré-requisitos conforme o sistema operacional"
+
   case "$(uname -s)" in
     Darwin)
-      install_macos_dependencies
+      command -v brew >/dev/null 2>&1 || die "Homebrew precisa estar instalado antes do Zsh."
+      if ! command -v zsh >/dev/null 2>&1; then
+        brew install zsh
+      fi
       ;;
     Linux)
       install_linux_prerequisites
@@ -176,18 +178,6 @@ install_platform_dependencies() {
       die "Sistema operacional não suportado: $(uname -s)"
       ;;
   esac
-}
-
-install_oh_my_zsh() {
-  step "Instalando ou verificando o Oh My Zsh"
-  command -v curl >/dev/null 2>&1 || die "Comando necessário não encontrado: curl"
-  command -v zsh >/dev/null 2>&1 || die "Comando necessário não encontrado: zsh"
-
-  export ZSH="${ZSH:-$HOME/.oh-my-zsh}"
-  if [[ ! -d "$ZSH" ]]; then
-    RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
-      sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-  fi
 }
 
 install_zsh_plugin() {
@@ -199,8 +189,18 @@ install_zsh_plugin() {
   fi
 }
 
-install_zsh_plugins() {
-  step "Instalando Powerlevel10k e plugins do Zsh"
+install_oh_my_zsh_and_plugins() {
+  step "Instalando ou verificando Oh My Zsh"
+  command -v curl >/dev/null 2>&1 || die "Comando necessário não encontrado: curl"
+  command -v zsh >/dev/null 2>&1 || die "Comando necessário não encontrado: zsh"
+
+  export ZSH="${ZSH:-$HOME/.oh-my-zsh}"
+  if [[ ! -d "$ZSH" ]]; then
+    RUNZSH=no CHSH=no KEEP_ZSHRC=yes \
+      sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  fi
+
+  step "Clonando Powerlevel10k e plugins do Zsh"
   local zsh_custom="${ZSH_CUSTOM:-$ZSH/custom}"
   mkdir -p "$zsh_custom/themes" "$zsh_custom/plugins"
 
@@ -213,6 +213,14 @@ install_zsh_plugins() {
   install_zsh_plugin \
     "https://github.com/zsh-users/zsh-syntax-highlighting.git" \
     "$zsh_custom/plugins/zsh-syntax-highlighting"
+}
+
+create_zshrc_local() {
+  step "Criando ~/.zshrc.local"
+
+  if [[ ! -e "$HOME/.zshrc.local" ]]; then
+    touch "$HOME/.zshrc.local"
+  fi
 }
 
 stow_dotfiles() {
@@ -230,12 +238,13 @@ stow_dotfiles() {
 
 setup_all() {
   setup_ssh_key
-  configure_git
-  ensure_dotfiles_repository
-  # install_platform_dependencies
-  # install_oh_my_zsh
-  # install_zsh_plugins
+  setup_git_and_github
+  clone_dotfiles_repository
   stow_dotfiles
+  install_macos_homebrew_and_brewfile
+  install_zsh
+  install_oh_my_zsh_and_plugins
+  create_zshrc_local
   printf '\nSetup concluído. Abra um novo terminal para carregar as configurações do Zsh.\n'
 }
 
