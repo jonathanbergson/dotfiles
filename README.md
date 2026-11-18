@@ -2,11 +2,17 @@
 
 ## Setup
 
-Clone este repositório para `~/dotfiles` e execute:
+Clone este repositório para `~/dotfiles`. Para executar todas as etapas:
 
 ```sh
 cd ~/dotfiles
-bash setup.sh
+./setup.sh
+```
+
+Para criar somente os links dos dotfiles no diretório home com Stow:
+
+```sh
+./setup.sh dotfiles
 ```
 
 O script configura a chave SSH e o Git, instala Zsh, Oh My Zsh, Powerlevel10k e
