@@ -7,27 +7,44 @@ readonly DOTFILES_REPOSITORY="https://github.com/jonathanbergson/dotfiles.git"
 
 if [[ -t 1 ]]; then
   readonly GREEN=$'\033[0;32m'
+  readonly BLUE=$'\033[1;34m'
   readonly RESET=$'\033[0m'
+  readonly INFO_RESET=$'\033[0m'
 else
   readonly GREEN=""
+  readonly BLUE=""
   readonly RESET=""
+  readonly INFO_RESET=""
 fi
 
 if [[ -t 2 ]]; then
   readonly RED=$'\033[1;31m'
+  readonly YELLOW=$'\033[1;33m'
   readonly ERROR_RESET=$'\033[0m'
+  readonly WARNING_RESET=$'\033[0m'
 else
   readonly RED=""
+  readonly YELLOW=""
   readonly ERROR_RESET=""
+  readonly WARNING_RESET=""
 fi
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_HOME="$HOME/dotfiles"
 STEP_COUNTER=0
+BREW_BUNDLE_FAILED=0
 
 die() {
   printf '\n%s >> ERRO: %s%s\n\n' "$RED" "$*" "$ERROR_RESET" >&2
   exit 1
+}
+
+warn() {
+  printf '\n%s >> AVISO: %s%s\n\n' "$YELLOW" "$*" "$WARNING_RESET" >&2
+}
+
+info() {
+  printf '\n%s%s%s\n\n' "$BLUE" "$*" "$INFO_RESET"
 }
 
 step() {
@@ -87,13 +104,14 @@ setup_ssh_key() {
 
   [[ -f "$ssh_key.pub" ]] || die "Não foi encontrada a chave pública $ssh_key.pub."
   step "Cadastrando chave SSH no GitHub"
-  printf '\nAdicione esta chave pública à sua conta do GitHub em https://github.com/settings/keys:\n\n'
+  info "Adicione esta chave pública à sua conta do GitHub em https://github.com/settings/keys:"
   cat "$ssh_key.pub"
   printf '\n'
   if [[ -t 0 ]]; then
-    read -r -p "Pressione Enter depois de adicionar a chave ao GitHub para continuar. "
+    printf '%sPressione Enter depois de adicionar a chave ao GitHub para continuar.%s ' "$BLUE" "$INFO_RESET"
+    read -r
   else
-    printf 'Adicione a chave ao GitHub antes de usar autenticação SSH.\n'
+    info "Adicione a chave ao GitHub antes de usar autenticação SSH."
   fi
 }
 
@@ -165,7 +183,10 @@ install_macos_homebrew_and_brewfile() {
 
   command -v brew >/dev/null 2>&1 || die "Homebrew foi instalado, mas brew não está no PATH."
   step "Instalando pacotes do Brewfile no macOS"
-  brew bundle --file="$SCRIPT_DIR/apps/homebrew/Brewfile"
+  if ! brew bundle --file="$SCRIPT_DIR/apps/homebrew/Brewfile"; then
+    BREW_BUNDLE_FAILED=1
+    warn "Falha ao instalar um ou mais pacotes do Brewfile; continuando as demais etapas."
+  fi
 }
 
 install_zsh() {
@@ -242,12 +263,16 @@ setup_all() {
   install_zsh
   install_oh_my_zsh_and_plugins
   create_zshrc_local
-  printf '\nSetup concluído. Abra um novo terminal para carregar as configurações do Zsh.\n'
+  if (( BREW_BUNDLE_FAILED )); then
+    warn "Setup concluído com ressalvas: verifique as falhas do Brewfile acima."
+    return 1
+  fi
+  info "Setup concluído. Abra um novo terminal para carregar as configurações do Zsh."
 }
 
 setup_dotfiles() {
   stow_dotfiles
-  printf '\nLinks dos dotfiles criados com Stow.\n'
+  info "Links dos dotfiles criados com Stow."
 }
 
 main() {
