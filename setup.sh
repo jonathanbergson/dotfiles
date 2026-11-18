@@ -13,13 +13,21 @@ else
   readonly RESET=""
 fi
 
+if [[ -t 2 ]]; then
+  readonly RED=$'\033[1;31m'
+  readonly ERROR_RESET=$'\033[0m'
+else
+  readonly RED=""
+  readonly ERROR_RESET=""
+fi
+
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES_HOME="$HOME/dotfiles"
 DOTFILES_DIR="$SCRIPT_DIR"
 STEP_COUNTER=0
 
 die() {
-  printf 'Erro: %s\n' "$*" >&2
+  printf '\n%s >> ERRO: %s%s\n\n' "$RED" "$*" "$ERROR_RESET" >&2
   exit 1
 }
 
